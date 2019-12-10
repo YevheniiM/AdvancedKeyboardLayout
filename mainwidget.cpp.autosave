@@ -311,6 +311,9 @@ void MainWidget::apply()
 void MainWidget::deleteHooks()
 {
     hook.ReleaseHook();
+    for(size_t index = 0 &button: all_buttons){
+        delete(std::get<0>(button.second));
+    }
 }
 
 void MainWidget::keyPressEvent(QKeyEvent *event) {

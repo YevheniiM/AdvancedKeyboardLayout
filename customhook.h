@@ -41,8 +41,6 @@ public:
 
     CustomHook(int choice);
 
-    ~CustomHook();
-
     void SetHook();
 
     void ReleaseHook();

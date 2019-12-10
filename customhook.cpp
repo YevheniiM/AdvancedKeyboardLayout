@@ -98,11 +98,6 @@ CustomHook::CustomHook(int choice)
     this->choice = choice;
 }
 
-CustomHook::~CustomHook()
-{
-    ReleaseHook();
-}
-
 void CustomHook::SetHook()
 {
     bool is_set = false;
