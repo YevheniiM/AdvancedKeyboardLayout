@@ -4,8 +4,7 @@
 #include <QKeyEvent>
 #include "mainwidget.h"
 
-extern VirtualKeyMapper remapper;
-
+VirtualKeyMapper remapper = VirtualKeyMapper();
 MainWidget::MainWidget() {
     // create two areas, where program will take out results
     display_old_layout = new QLineEdit("New keyboard layout input");
@@ -127,6 +126,7 @@ MainWidget::MainWidget() {
     clear = true;
     hook = CustomHook();
     hook.SetHook();
+    activeButton = "";
     // set layout, name and icon of window
     setLayout(layout);
     setWindowTitle("Smart Keyboard");
@@ -238,7 +238,7 @@ void MainWidget::keypressed(const QString &text)
         txt = button->text();
     }
     if(txt != ""){
-        if(button == NULL && activeButton == ""){
+        if((button == NULL && activeButton == "") || txt.length() > 1){
             if(clear){
                 display_new_layout->setText("");
                 display_old_layout->setText("");
@@ -256,17 +256,13 @@ void MainWidget::keypressed(const QString &text)
             }else{
                 display_old_layout->setText(display_old_layout->text() + txt);
             }
-        }
-        if(button != NULL && activeButton == ""){
+        }else if(button != NULL && activeButton == ""){
             activeButton = txt;
-        }
-        if(button != NULL && activeButton != ""){
+        }else if(activeButton != ""){
+            QToolButton *new_button = std::get<0>(all_buttons.find(activeButton)->second);
             remapper.remap(activeButton.toUpper().toStdString(), txt.toUpper().toStdString());
-            button->setText(txt);
-        }
-        if(button == NULL && activeButton != ""){
-            remapper.remap(activeButton.toUpper().toStdString(), txt.toUpper().toStdString());
-            std::get<0>(all_buttons.find(activeButton)->second)->setText(txt);
+            new_button->setText(txt);
+            activeButton = "";
         }
     }
 // remap(txt)

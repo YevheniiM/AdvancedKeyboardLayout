@@ -10,8 +10,6 @@
 
 #include "customhook.h"
 
-VirtualKeyMapper remapper;
-
 class MainWidget : public QWidget
 {
     Q_OBJECT
