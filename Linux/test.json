@@ -1,0 +1,11 @@
+{
+  "id": 0,
+  "keymap": {
+    "KEY_A": ["KEY_H", "KEY_F"],
+    "KEY_S": ["KEY_E"]
+  },
+  "mode": {
+    "type": "long_press",
+    "value": 1
+  }
+}

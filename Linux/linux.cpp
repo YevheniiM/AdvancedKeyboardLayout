@@ -1,23 +1,12 @@
 // #define _GNU_SOURCE
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <linux/input.h>
-#include <linux/uinput.h>
-#include <string.h>
-#include <stdio.h>
-#include <X11/XKBlib.h>
-#include <iostream>
-
 // #include "keymap.h"
 #include "remapper.hpp"
 
 
 
 
-int main(void)
+int main()
 {
 
     auto rmp = Remapper();

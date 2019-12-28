@@ -1,10 +1,29 @@
+#include "rapidjson/document.h"
+//#include "rapidjson/writer.h"
+//#include "rapidjson/stringbuffer.h"
+//#include "rapidjson/filereadstream.h"
+#include "rapidjson/istreamwrapper.h"
+
 #include <map>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <linux/input.h>
 #include <linux/uinput.h>
+#include <string.h>
+#include <stdio.h>
+#include <X11/XKBlib.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+
+using namespace rapidjson;
 
 
 class Remapper
 {
-public:
     std::map<std::string, int> std_keymap =
             {
 // {"KEY_RESERVED",		KEY_RESERVED},
@@ -260,16 +279,10 @@ public:
     std::map<int, int> custom_keymap;
     int fdi;
     int fdo = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-    struct input_event ev;
-    ssize_t n;
-
-
-    void init_custom_keymap()
-    {
-        for (auto &p : std_keymap)
-            custom_keymap[p.second] = p.second;
-    }
-
+//    int fdi = fdo;
+    struct input_event ev{};
+    ssize_t n{};
+    struct uinput_setup usetup{};
 
     const char *const evval[3] = {
             "RELEASED",
@@ -277,29 +290,100 @@ public:
             "REPEATED"
     };
 
-
-    Remapper()
+    using RemapperConf = struct RemapperConf
     {
-        init_custom_keymap();
-        struct uinput_setup usetup;
+        enum RemapMode
+        {
+            LONG_PRESS, MULTIPLE_PRESS
+        };
+        std::map<std::string, RemapMode> remap_mode_str2enum{
+                {"long_press",     LONG_PRESS},
+                {"LongPress",      LONG_PRESS},
+                {"multiple_press", MULTIPLE_PRESS},
+                {"MultiplePress",  MULTIPLE_PRESS},
+        };
 
-//    /*
-//     * The ioctls below will enable the device that is about to be
-//     * created, to pass key events, in this case the space key.
-//     */
-        ioctl(fdo, UI_SET_EVBIT, EV_KEY);
-        for (auto &p: std_keymap)
-            //    std::cout << p.second << std::endl;
-            ioctl(fdo, UI_SET_KEYBIT, p.second);
+        int remapper_pid{};
+        std::map<std::string, std::vector<std::string>> keymap{};
+        RemapMode mode{LONG_PRESS};
+        int remap_conf_value{};
 
+        RemapperConf() = default;
+
+
+        RemapperConf(const Document &d) :
+                remapper_pid{d["id"].GetInt()},
+                mode{remap_mode_str2enum[d["mode"].GetObject()["type"].GetString()]},
+                remap_conf_value{d["mode"].GetObject()["value"].GetInt()}
+        {
+            for (auto doc_it = d["keymap"].MemberBegin(); doc_it != d["keymap"].MemberEnd(); ++doc_it)
+                keymap[doc_it->name.GetString()] = array2vector(doc_it);
+        }
+
+
+        std::vector<std::string> array2vector(const rapidjson::Document::ConstMemberIterator &doc_it)
+        {
+//          rapidjson::Array to std::vector
+            std::vector<std::string> remaps{};
+            auto remaps_array = doc_it->value.GetArray();
+            remaps.reserve(remaps_array.Size());
+            for (auto i = 0; i < remaps_array.Size(); ++i)
+                remaps.emplace_back(remaps_array[i].GetString());
+            return remaps;
+        }
+    };
+
+
+    RemapperConf confs_from_json(const std::string &json_file_name)
+    {
+        std::ifstream ifs(json_file_name);
+        IStreamWrapper isw(ifs);
+
+        Document d;
+        d.ParseStream(isw);
+
+        return {d};
+    }
+
+
+    inline void init_custom_keymap()
+    {
+        for (auto &p : std_keymap)
+            custom_keymap[p.second] = p.second;
+    }
+
+
+    inline void setup_user_input()
+    {
         memset(&usetup, 0, sizeof(usetup));
         usetup.id.bustype = BUS_USB;
         usetup.id.vendor = 0x1234; /* sample vendor */
         usetup.id.product = 0x5678; /* sample product */
         strcpy(usetup.name, "Example device");
+    }
 
+
+    inline void enable_input_changing()
+    {
+        ioctl(fdo, UI_SET_EVBIT, EV_KEY);
+        for (auto &p: std_keymap)
+            ioctl(fdo, UI_SET_KEYBIT, p.second);
         ioctl(fdo, UI_DEV_SETUP, &usetup);
         ioctl(fdo, UI_DEV_CREATE);
+    }
+
+
+public:
+
+    Remapper()
+    {
+//        strict order
+        init_custom_keymap();
+        setup_user_input();
+        enable_input_changing();
+
+        auto confs = confs_from_json("../test.json");
+
         /*
          * On UI_DEV_CREATE the kernel will create the device node for this
          * device. We are inserting a pause here so that userspace has time
@@ -308,11 +392,12 @@ public:
          * to send. This pause is only needed in our example code!
          */
         const char *dev = "/dev/input/by-path/platform-i8042-serio-0-event-kbd";
+//        const char *dev = "/dev/input/event4";
         fdi = open(dev, O_RDWR);
         if (fdi == -1)
         {
             fprintf(stderr, "Cannot open %s: %s.\n", dev, strerror(errno));
-            // return EXIT_FAILURE;
+//             return EXIT_FAILURE;
         }
     }
 
@@ -330,7 +415,7 @@ public:
 
     void listen()
     {
-        while (1)
+        while (true)
         {
             n = read(fdi, &ev, sizeof ev);
             if (n == (ssize_t) -1)
@@ -349,14 +434,23 @@ public:
             {
                 printf("%s 0x%04x (%d)\n", evval[ev.value], (int) ev.code, (int) ev.code);
                 // ev.code = custom_keymap[ev.code];
+                std::cout << "sec" << ev.time.tv_sec
+                          << "usec" << ev.time.tv_usec << std::endl;
+
                 if (evval[ev.value] == "PRESSED ")
                     send_new_event(fdo, ev.code);
             }
-
         }
     }
 
 
+    inline void remap(const std::string &original, const std::string &remapped)
+    {
+        custom_keymap[std_keymap[original]] = std_keymap[remapped];
+    }
+
+
+private:
     void emit(int fd, int type, int code, int val)
     {
         struct input_event ie;
@@ -398,12 +492,5 @@ public:
             emit(fdo, EV_SYN, SYN_REPORT, 0);
         }
     }
-
-
-    inline void remap(const std::string &original, const std::string &remapped)
-    {
-        custom_keymap[std_keymap[original]] = std_keymap[remapped];
-    }
-
 
 };

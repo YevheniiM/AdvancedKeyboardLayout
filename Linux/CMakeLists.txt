@@ -3,4 +3,7 @@ project(linux)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(remapper linux.cpp remapper.hpp)
+include_directories("/rapidjson/")
+
+add_executable(remapper linux.cpp remapper.hpp
+        )
