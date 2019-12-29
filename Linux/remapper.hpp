@@ -17,6 +17,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 
 
 using namespace rapidjson;
@@ -24,77 +25,78 @@ using namespace rapidjson;
 
 class Remapper
 {
+
     std::map<std::string, int> std_keymap =
             {
 // {"KEY_RESERVED",		KEY_RESERVED},
-// {"KEY_ESC",			KEY_ESC},
-// {"KEY_1",			KEY_1},
-// {"KEY_2",			KEY_2},
-// {"KEY_3",			KEY_3},
-// {"KEY_4",			KEY_4},
-// {"KEY_5",			KEY_5},
-// {"KEY_6",			KEY_6},
-// {"KEY_7",			KEY_7},
-// {"KEY_8",			KEY_8},
-// {"KEY_9",			KEY_9},
-// {"KEY_0",			KEY_0},
-// {"KEY_MINUS",		KEY_MINUS},
-// {"KEY_EQUAL",		KEY_EQUAL},
-                    {"KEY_BACKSPACE", KEY_BACKSPACE},
-// {"KEY_TAB",			KEY_TAB},
-                    {"KEY_Q",         KEY_Q},
-                    {"KEY_W",         KEY_W},
-                    {"KEY_E",         KEY_E},
-                    {"KEY_R",         KEY_R},
-                    {"KEY_T",         KEY_T},
-                    {"KEY_Y",         KEY_Y},
-                    {"KEY_U",         KEY_U},
-                    {"KEY_I",         KEY_I},
-                    {"KEY_O",         KEY_O},
-                    {"KEY_P",         KEY_P},
-// {"KEY_LEFTBRACE",		KEY_LEFTBRACE},
-// {"KEY_RIGHTBRACE",		KEY_RIGHTBRACE},
-// {"KEY_ENTER",		KEY_ENTER},
-// {"KEY_LEFTCTRL",		KEY_LEFTCTRL},
-                    {"KEY_A",         KEY_A},
-                    {"KEY_S",         KEY_S},
-                    {"KEY_D",         KEY_D},
-                    {"KEY_F",         KEY_F},
-                    {"KEY_G",         KEY_G},
-                    {"KEY_H",         KEY_H},
-                    {"KEY_J",         KEY_J},
-                    {"KEY_K",         KEY_K},
-                    {"KEY_L",         KEY_L},
-// {"KEY_SEMICOLON",		KEY_SEMICOLON},
-// {"KEY_APOSTROPHE",		KEY_APOSTROPHE},
-// {"KEY_GRAVE",		KEY_GRAVE},
-// {"KEY_LEFTSHIFT",		KEY_LEFTSHIFT},
-                    {"KEY_BACKSLASH", KEY_BACKSLASH},
-                    {"KEY_Z",         KEY_Z},
-                    {"KEY_X",         KEY_X},
-                    {"KEY_C",         KEY_C},
-                    {"KEY_V",         KEY_V},
-                    {"KEY_B",         KEY_B},
-                    {"KEY_N",         KEY_N},
-                    {"KEY_M",         KEY_M},
-                    {"KEY_COMMA",     KEY_COMMA},
-                    {"KEY_DOT",       KEY_DOT},
-                    {"KEY_SLASH",     KEY_SLASH},
-// {"KEY_RIGHTSHIFT",		KEY_RIGHTSHIFT},
+                    {"KEY_ESC",        KEY_ESC},
+                    {"KEY_1",          KEY_1},
+                    {"KEY_2",          KEY_2},
+                    {"KEY_3",          KEY_3},
+                    {"KEY_4",          KEY_4},
+                    {"KEY_5",          KEY_5},
+                    {"KEY_6",          KEY_6},
+                    {"KEY_7",          KEY_7},
+                    {"KEY_8",          KEY_8},
+                    {"KEY_9",          KEY_9},
+                    {"KEY_0",          KEY_0},
+                    {"KEY_MINUS",      KEY_MINUS},
+                    {"KEY_EQUAL",      KEY_EQUAL},
+                    {"KEY_BACKSPACE",  KEY_BACKSPACE},
+                    {"KEY_TAB",        KEY_TAB},
+                    {"KEY_Q",          KEY_Q},
+                    {"KEY_W",          KEY_W},
+                    {"KEY_E",          KEY_E},
+                    {"KEY_R",          KEY_R},
+                    {"KEY_T",          KEY_T},
+                    {"KEY_Y",          KEY_Y},
+                    {"KEY_U",          KEY_U},
+                    {"KEY_I",          KEY_I},
+                    {"KEY_O",          KEY_O},
+                    {"KEY_P",          KEY_P},
+                    {"KEY_LEFTBRACE",  KEY_LEFTBRACE},
+                    {"KEY_RIGHTBRACE", KEY_RIGHTBRACE},
+                    {"KEY_ENTER",      KEY_ENTER},
+                    {"KEY_LEFTCTRL",   KEY_LEFTCTRL},
+                    {"KEY_A",          KEY_A},
+                    {"KEY_S",          KEY_S},
+                    {"KEY_D",          KEY_D},
+                    {"KEY_F",          KEY_F},
+                    {"KEY_G",          KEY_G},
+                    {"KEY_H",          KEY_H},
+                    {"KEY_J",          KEY_J},
+                    {"KEY_K",          KEY_K},
+                    {"KEY_L",          KEY_L},
+                    {"KEY_SEMICOLON",  KEY_SEMICOLON},
+                    {"KEY_APOSTROPHE", KEY_APOSTROPHE},
+                    {"KEY_GRAVE",      KEY_GRAVE},
+                    {"KEY_LEFTSHIFT",  KEY_LEFTSHIFT},
+                    {"KEY_BACKSLASH",  KEY_BACKSLASH},
+                    {"KEY_Z",          KEY_Z},
+                    {"KEY_X",          KEY_X},
+                    {"KEY_C",          KEY_C},
+                    {"KEY_V",          KEY_V},
+                    {"KEY_B",          KEY_B},
+                    {"KEY_N",          KEY_N},
+                    {"KEY_M",          KEY_M},
+                    {"KEY_COMMA",      KEY_COMMA},
+                    {"KEY_DOT",        KEY_DOT},
+                    {"KEY_SLASH",      KEY_SLASH},
+                    {"KEY_RIGHTSHIFT", KEY_RIGHTSHIFT},
 // {"KEY_KPASTERISK",		KEY_KPASTERISK},
-// {"KEY_LEFTALT",		KEY_LEFTALT},
-                    {"KEY_SPACE",     KEY_SPACE},
-// {"KEY_CAPSLOCK",		KEY_CAPSLOCK},
-// {"KEY_F1",			KEY_F1},
-// {"KEY_F2",			KEY_F2},
-// {"KEY_F3",			KEY_F3},
-// {"KEY_F4",			KEY_F4},
-// {"KEY_F5",			KEY_F5},
-// {"KEY_F6",			KEY_F6},
-// {"KEY_F7",			KEY_F7},
-// {"KEY_F8",			KEY_F8},
-// {"KEY_F9",			KEY_F9},
-// {"KEY_F10",			KEY_F10},
+                    {"KEY_LEFTALT",    KEY_LEFTALT},
+                    {"KEY_SPACE",      KEY_SPACE},
+                    {"KEY_CAPSLOCK",   KEY_CAPSLOCK},
+                    {"KEY_F1",         KEY_F1},
+                    {"KEY_F2",         KEY_F2},
+                    {"KEY_F3",         KEY_F3},
+                    {"KEY_F4",         KEY_F4},
+                    {"KEY_F5",         KEY_F5},
+                    {"KEY_F6",         KEY_F6},
+                    {"KEY_F7",         KEY_F7},
+                    {"KEY_F8",         KEY_F8},
+                    {"KEY_F9",         KEY_F9},
+                    {"KEY_F10",        KEY_F10},
 // {"KEY_NUMLOCK",		KEY_NUMLOCK},
 // {"KEY_SCROLLLOCK",		KEY_SCROLLLOCK},
 // {"KEY_KP7",			KEY_KP7},
@@ -112,8 +114,8 @@ class Remapper
 // {"KEY_KPDOT",		KEY_KPDOT},
 // {"KEY_ZENKAKUHANKAKU",	KEY_ZENKAKUHANKAKU},
 // {"KEY_102ND",		KEY_102ND},
-// {"KEY_F11",			KEY_F11},
-// {"KEY_F12",			KEY_F12},
+                    {"KEY_F11",        KEY_F11},
+                    {"KEY_F12",        KEY_F12},
 // {"KEY_RO",			KEY_RO},
 // {"KEY_KATAKANA",		KEY_KATAKANA},
 // {"KEY_HIRAGANA",		KEY_HIRAGANA},
@@ -122,19 +124,19 @@ class Remapper
 // {"KEY_MUHENKAN",		KEY_MUHENKAN},
 // {"KEY_KPJPCOMMA",		KEY_KPJPCOMMA},
 // {"KEY_KPENTER",		KEY_KPENTER},
-// {"KEY_RIGHTCTRL",		KEY_RIGHTCTRL},
+                    {"KEY_RIGHTCTRL",  KEY_RIGHTCTRL},
 // {"KEY_KPSLASH",		KEY_KPSLASH},
 // {"KEY_SYSRQ",		KEY_SYSRQ},
-// {"KEY_RIGHTALT",		KEY_RIGHTALT},
+                    {"KEY_RIGHTALT",   KEY_RIGHTALT},
 // {"KEY_LINEFEED",		KEY_LINEFEED},
-// {"KEY_HOME",		KEY_HOME},
-// {"KEY_UP",			KEY_UP},
-// {"KEY_PAGEUP",		KEY_PAGEUP},
-// {"KEY_LEFT",		KEY_LEFT},
-// {"KEY_RIGHT",		KEY_RIGHT},
-// {"KEY_END",			KEY_END},
-// {"KEY_DOWN",		KEY_DOWN},
-// {"KEY_PAGEDOWN",		KEY_PAGEDOWN},
+                    {"KEY_HOME",       KEY_HOME},
+                    {"KEY_UP",         KEY_UP},
+                    {"KEY_PAGEUP",     KEY_PAGEUP},
+                    {"KEY_LEFT",       KEY_LEFT},
+                    {"KEY_RIGHT",      KEY_RIGHT},
+                    {"KEY_END",        KEY_END},
+                    {"KEY_DOWN",       KEY_DOWN},
+                    {"KEY_PAGEDOWN",   KEY_PAGEDOWN},
 // {"KEY_INSERT",		KEY_INSERT},
 // {"KEY_DELETE",		KEY_DELETE},
 // {"KEY_MACRO",		KEY_MACRO},
@@ -275,8 +277,101 @@ class Remapper
 // {"KEY_RFKILL",		KEY_RFKILL},
 // {"KEY_MICMUTE",		KEY_MICMUTE}
             };
+    std::map<std::string, std::string> unix2common =
+            {
+                    {"KEY_ESC",        "esc"},
+                    {"KEY_F1",         "f1"},
+                    {"KEY_F2",         "f2"},
+                    {"KEY_F3",         "f3"},
+                    {"KEY_F4",         "f4"},
+                    {"KEY_F5",         "f5"},
+                    {"KEY_F6",         "f6"},
+                    {"KEY_F7",         "f7"},
+                    {"KEY_F8",         "f8"},
+                    {"KEY_F9",         "f9"},
+                    {"KEY_F10",        "f10"},
+                    {"KEY_F11",        "f11"},
+                    {"KEY_F12",        "f12"},
+                    {"KEY_HOME",       "home"},
+                    {"KEY_PAGEUP",     "pgup"},
+                    {"KEY_PAGEDOWN",   "pgdn"},
+                    {"KEY_END",        "end"},
+                    {"KEY_GRAVE",      "`"},
+                    {"KEY_0",          "0"},
+                    {"KEY_1",          "1"},
+                    {"KEY_2",          "2"},
+                    {"KEY_3",          "3"},
+                    {"KEY_4",          "4"},
+                    {"KEY_5",          "5"},
+                    {"KEY_6",          "6"},
+                    {"KEY_7",          "7"},
+                    {"KEY_8",          "8"},
+                    {"KEY_9",          "9"},
+                    {"KEY_MINUS",      "-"},
+                    {"KEY_EQUAL",      "="},
+                    {"KEY_BACKSPACE",  "backspace"},
+                    {"KEY_TAB",        "tab"},
+                    {"KEY_Q",          "q"},
+                    {"KEY_W",          "w"},
+                    {"KEY_E",          "e"},
+                    {"KEY_R",          "r"},
+                    {"KEY_T",          "t"},
+                    {"KEY_Y",          "y"},
+                    {"KEY_U",          "u"},
+                    {"KEY_I",          "i"},
+                    {"KEY_O",          "o"},
+                    {"KEY_P",          "p"},
+                    {"KEY_LEFTBRACE",  "["},
+                    {"KEY_RIGHTBRACE", "]"},
+                    {"KEY_BACKSLASH",  "\\"},
+                    {"KEY_CAPSLOCK",   "caps lock"},
+                    {"KEY_A",          "a"},
+                    {"KEY_S",          "s"},
+                    {"KEY_D",          "d"},
+                    {"KEY_F",          "f"},
+                    {"KEY_G",          "g"},
+                    {"KEY_H",          "h"},
+                    {"KEY_J",          "j"},
+                    {"KEY_K",          "k"},
+                    {"KEY_L",          "l"},
+                    {"KEY_SEMICOLON",  ";"},
+                    {"KEY_APOSTROPHE", "'"},
+                    {"KEY_ENTER",      "enter"},
+                    {"KEY_LEFTSHIFT",  "left shift"},
+                    {"KEY_Z",          "z"},
+                    {"KEY_X",          "x"},
+                    {"KEY_C",          "c"},
+                    {"KEY_V",          "v"},
+                    {"KEY_B",          "b"},
+                    {"KEY_N",          "n"},
+                    {"KEY_M",          "m"},
+                    {"KEY_COMMA",      ","},
+                    {"KEY_DOT",        "."},
+                    {"KEY_SLASH",      "/"},
+                    {"KEY_RIGHTSHIFT", "right shift"},
+                    {"KEY_UP",         "up"},
+                    {"KEY_LEFTCTRL",   "left ctrl"},
+                    {"KEY_LEFTALT",    "left alt"},
+                    {"KEY_SPACE",      "space"},
+                    {"KEY_RIGHTALT",   "right alt"},
+                    {"KEY_RIGHTCTRL",  "right ctrl"},
+                    {"KEY_LEFT",       "left"},
+                    {"KEY_DOWN",       "down"},
+                    {"KEY_RIGHT",      "right"},
+//                    {"pause/nbreak",   std_keymap[""]},
+//                    {"prt sc/nsysrq",  std_keymap[""]},
+//                    {"delete/ninsert", std_keymap[""]},
+//                    {"num lk/scr lk",  std_keymap[""]},
+//                    {"*",           std_keymap[""]},
+//                    {"+",              std_keymap[""]},
+//                    {"fn",             std_keymap[""]},
+//                    {"win",            std_keymap[""]},
+//                    {"context/nmenu",  std_keymap[""]},
+//                    {"0/ninser",       std_keymap[""]},
+            };
 
-    std::map<int, int> custom_keymap;
+    std::map<int, std::vector<int>> custom_keymap;
+    std::map<std::string, std::string> common2unix{};
     int fdi;
     int fdo = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
 //    int fdi = fdo;
@@ -327,6 +422,7 @@ class Remapper
             std::vector<std::string> remaps{};
             auto remaps_array = doc_it->value.GetArray();
             remaps.reserve(remaps_array.Size());
+            
             for (auto i = 0; i < remaps_array.Size(); ++i)
                 remaps.emplace_back(remaps_array[i].GetString());
             return remaps;
@@ -346,10 +442,23 @@ class Remapper
     }
 
 
-    inline void init_custom_keymap()
+    inline void configure_custom_keymap(RemapperConf &confs)
     {
+
         for (auto &p : std_keymap)
-            custom_keymap[p.second] = p.second;
+            if (confs.keymap.count(unix2common[p.first]))
+            {
+                auto keys_to_remap = confs.keymap[unix2common[p.first]];
+                std::vector<int> remapped;
+                remapped.reserve(keys_to_remap.size());
+
+                for (auto & v : keys_to_remap)
+                    remapped.emplace_back(std_keymap[common2unix[v]]);
+
+                custom_keymap[p.second] = remapped;
+            }
+            else
+                custom_keymap[p.second] = std::vector<int>{p.second};
     }
 
 
@@ -378,12 +487,14 @@ public:
     Remapper()
     {
 //        strict order
-        init_custom_keymap();
+        for (auto & p : unix2common)
+            common2unix[p.second] = p.first;
         setup_user_input();
         enable_input_changing();
-
         auto confs = confs_from_json("../test.json");
+        configure_custom_keymap(confs);
 
+        
         /*
          * On UI_DEV_CREATE the kernel will create the device node for this
          * device. We are inserting a pause here so that userspace has time
@@ -392,7 +503,6 @@ public:
          * to send. This pause is only needed in our example code!
          */
         const char *dev = "/dev/input/by-path/platform-i8042-serio-0-event-kbd";
-//        const char *dev = "/dev/input/event4";
         fdi = open(dev, O_RDWR);
         if (fdi == -1)
         {
@@ -405,7 +515,7 @@ public:
     ~Remapper()
     {
         fflush(stdout);
-        fprintf(stderr, "%s.\n", strerror(errno));
+//        fprintf(stderr, "%s.\n", strerror(errno));
         ioctl(fdo, UI_DEV_DESTROY);
         close(fdo);
         ioctl(fdi, UI_DEV_DESTROY);
@@ -415,6 +525,9 @@ public:
 
     void listen()
     {
+        time_t last_press{0};
+        std::string last_event_type{};
+        int letter_iterator{0};
         while (true)
         {
             n = read(fdi, &ev, sizeof ev);
@@ -432,21 +545,26 @@ public:
             }
             if (ev.type == EV_KEY && ev.value >= 0 && ev.value <= 2)
             {
-                printf("%s 0x%04x (%d)\n", evval[ev.value], (int) ev.code, (int) ev.code);
+//                printf("%s 0x%04x (%d)\n", evval[ev.value], (int) ev.code, (int) ev.code);
                 // ev.code = custom_keymap[ev.code];
-                std::cout << "sec" << ev.time.tv_sec
-                          << "usec" << ev.time.tv_usec << std::endl;
+//                std::cout << "sec" << ev.time.tv_sec
+//                          << "usec" << ev.time.tv_usec << std::endl;
 
                 if (evval[ev.value] == "PRESSED ")
-                    send_new_event(fdo, ev.code);
+                {
+                    letter_iterator = 0;
+                    send_new_event(fdo, ev.code, letter_iterator);
+                    last_press = ev.time.tv_sec;
+                    last_event_type = "PRESSED ";
+                }
+                if (evval[ev.value] == "REPEATED" && ev.time.tv_sec - last_press > 1)
+                {
+                    send_new_event(fdo, ev.code, ++letter_iterator);
+                    last_press = ev.time.tv_sec;
+                    last_event_type = "REPEATED";
+                }
             }
         }
-    }
-
-
-    inline void remap(const std::string &original, const std::string &remapped)
-    {
-        custom_keymap[std_keymap[original]] = std_keymap[remapped];
     }
 
 
@@ -461,31 +579,27 @@ private:
         /* timestamp values below are ignored */
         ie.time.tv_sec = 0;
         ie.time.tv_usec = 0;
-        // std::cout << "sending: " << code << std::endl
         write(fd, &ie, sizeof(ie));
     }
 
 
-    void send_new_event(int fdo, int code)
+    void send_new_event(int fdo, int code, int lit)
     {
-        if (code != custom_keymap[code])
+        auto remaps = custom_keymap[code];
+        if (std::find(remaps.begin(), remaps.end(), code) == remaps.end())
         {
-            std::cout << "from: " << code << " to: " << custom_keymap[code] << std::endl;
-            // sleep(1);
             emit(fdo, EV_KEY, KEY_BACKSPACE, 1);
             emit(fdo, EV_SYN, SYN_REPORT, 0);
             emit(fdo, EV_KEY, KEY_BACKSPACE, 0);
             emit(fdo, EV_SYN, SYN_REPORT, 0);
-            // sleep(1);
-            emit(fdo, EV_KEY, custom_keymap[code], 1);
+
+            emit(fdo, EV_KEY, remaps[lit % remaps.size()], 1);
             emit(fdo, EV_SYN, SYN_REPORT, 0);
-            emit(fdo, EV_KEY, custom_keymap[code], 0);
+            emit(fdo, EV_KEY, remaps[lit % remaps.size()], 0);
             emit(fdo, EV_SYN, SYN_REPORT, 0);
-            // sleep(1);
         }
         else
         {
-            std::cout << "from: " << code << " to: " << code << std::endl;
             emit(fdo, EV_KEY, code, 1);
             emit(fdo, EV_SYN, SYN_REPORT, 0);
             emit(fdo, EV_KEY, code, 0);

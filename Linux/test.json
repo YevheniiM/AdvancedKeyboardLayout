@@ -1,8 +1,8 @@
 {
   "id": 0,
   "keymap": {
-    "KEY_A": ["KEY_H", "KEY_F"],
-    "KEY_S": ["KEY_E"]
+    "a": ["h", "f"],
+    "s": ["e"]
   },
   "mode": {
     "type": "long_press",
