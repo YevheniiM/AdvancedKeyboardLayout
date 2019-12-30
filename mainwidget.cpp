@@ -3,8 +3,9 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include "mainwidget.h"
+#include <iostream>
+#include "json_manager.h"
 
-VirtualKeyMapper remapper = VirtualKeyMapper();
 MainWidget::MainWidget() {
     // create two areas, where program will take out results
     display_old_layout = new QLineEdit("New keyboard layout input");
@@ -128,13 +129,6 @@ MainWidget::MainWidget() {
     QObject::connect(delete_button, SIGNAL(clicked()), this, SLOT(deleteHooks()));
 
     active_button = make_system_button("Active button", 8, 0, 1, 3);
-
-#ifdef __linux__
-    //linux code goes here
-#elif _WIN32
-    hook = CustomHook();
-    hook.SetHook();
-#endif
     clear = true;
     activeButton = "";
     is_key_pressed = false;
@@ -142,6 +136,13 @@ MainWidget::MainWidget() {
     setLayout(layout);
     setWindowTitle("Smart Keyboard");
     setWindowIcon(QIcon(":/keyboard.png"));
+
+    const std::string name{"/home/popenyuk/AdvancedKeyboardLayout/keyboardlayout.json"};
+//    try {
+//        remapperConf = confs_from_json(name);
+//    } catch (...) {
+//    }
+//    write_to_json(name, 0, "", 0.5, changed_vector_of_buttons);
 }
 
 MainWidget::~MainWidget()
@@ -230,11 +231,11 @@ void MainWidget::make_button(const QString &text, int x, int y, int height, int 
     button->setText(text);
     button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     layout->addWidget(button, x, y, height, width);
-    if(all_buttons.find(text.toLower()) == all_buttons.end()){
-        all_buttons[text.toLower()] = std::make_tuple(button, x, y);
+    if(all_buttons.find(text) == all_buttons.end()){
+        all_buttons[text] = std::make_tuple(button, x, y);
         QObject::connect(button, SIGNAL(clicked()), this, SLOT(keypressed()));
     }else{
-        all_buttons["numpad" + text.toLower()] = std::make_tuple(button, x, y);
+        all_buttons["numpad" + text] = std::make_tuple(button, x, y);
         QObject::connect(button, SIGNAL(clicked()), this, SLOT(keypressed()));
     }
 }
@@ -261,7 +262,7 @@ void MainWidget::keypressed(const QString &text)
         txt = button->text();
     }
     if(txt != ""){
-        if((button == nullptr && activeButton == "") || txt.length() > 1){
+        if((button == nullptr && activeButton == "")){
             if(clear){
                 display_new_layout->setText("");
                 display_old_layout->setText("");
@@ -285,7 +286,7 @@ void MainWidget::keypressed(const QString &text)
             active_button->setText(activeButton);
         }else if(activeButton != ""){
             QToolButton *new_button = std::get<0>(all_buttons.find(activeButton)->second);
-            changed_buttons[activeButton.toUpper()] = txt.toUpper();
+            changed_vector_of_buttons[activeButton.toStdString()].push_back(txt.toStdString());
             new_button->setText(txt);
             activeButton = "";
             active_button->setText("Active button");
@@ -298,24 +299,20 @@ void MainWidget::keypressed(const QString &text)
 
 void MainWidget::apply()
 {
-    for(auto &item: changed_buttons){
-#ifdef __linux__
-    //linux code goes here
-#elif _WIN32
-        remapper.remap(item.first.toStdString(), item.second.toStdString());
-#endif
-    }
-    changed_buttons.clear();
+    const std::string name{"/home/popenyuk/AdvancedKeyboardLayout/keyboardlayout.json"};
+    auto current_json = confs_from_json(name);
+    std::cout << current_json.remapper_pid << std::endl;
+    write_to_json(name, current_json.remapper_pid, "", 0.5, changed_vector_of_buttons);
+    changed_vector_of_buttons.clear();
 }
 
 void MainWidget::deleteHooks()
 {
-    hook.ReleaseHook();
 }
 
 void MainWidget::keyPressEvent(QKeyEvent *event) {
     is_key_pressed += 1;
-    QString txt = event->text().toLower();
+    QString txt = event->text();
     std::map<QString, std::tuple<QToolButton*, int, int>>::iterator button = all_buttons.find(txt);
     std::map<QString, std::tuple<QToolButton*, int, int>>::iterator num_button = all_buttons.find("numpad" + txt);
     if(button != all_buttons.end()){
@@ -325,7 +322,7 @@ void MainWidget::keyPressEvent(QKeyEvent *event) {
         std::get<0>(num_button->second)->animateClick();
         keypressed("numpad" +txt);
     }else{
-        QString txt = getRightStringOfButton(event).toLower();
+        QString txt = getRightStringOfButton(event);
         std::map<QString, std::tuple<QToolButton*, int, int>>::iterator button = all_buttons.find(txt);
         std::map<QString, std::tuple<QToolButton*, int, int>>::iterator num_button = all_buttons.find("numpad" + txt);
         if(button != all_buttons.end()){

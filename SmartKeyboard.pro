@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++17
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -18,23 +18,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 unix{
 SOURCES += \
     main.cpp \
-    mainwidget.cpp \
-    customhooklinux.cpp
+    mainwidget.cpp
 
 HEADERS += \
-    keymap.h \
-    mainwidget.h \
-    customhooklinux.h
+    mainwidget.h
 }
 
 win32{
 SOURCES += \
     main.cpp \
-    mainwidget.cpp \
-    customhook.cpp
+    mainwidget.cpp
 
 HEADERS += \
-    customhook.h \
     mainwidget.h
 
 LIBS += -lKernel32 -luser32
@@ -47,3 +42,46 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     icons.qrc
+
+HEADERS += \
+    json_manager.h \
+    rapidjson/allocators.h \
+    rapidjson/cursorstreamwrapper.h \
+    rapidjson/document.h \
+    rapidjson/encodedstream.h \
+    rapidjson/encodings.h \
+    rapidjson/error/en.h \
+    rapidjson/error/error.h \
+    rapidjson/filereadstream.h \
+    rapidjson/filewritestream.h \
+    rapidjson/fwd.h \
+    rapidjson/internal/biginteger.h \
+    rapidjson/internal/clzll.h \
+    rapidjson/internal/diyfp.h \
+    rapidjson/internal/dtoa.h \
+    rapidjson/internal/ieee754.h \
+    rapidjson/internal/itoa.h \
+    rapidjson/internal/meta.h \
+    rapidjson/internal/pow10.h \
+    rapidjson/internal/regex.h \
+    rapidjson/internal/stack.h \
+    rapidjson/internal/strfunc.h \
+    rapidjson/internal/strtod.h \
+    rapidjson/internal/swap.h \
+    rapidjson/istreamwrapper.h \
+    rapidjson/memorybuffer.h \
+    rapidjson/memorystream.h \
+    rapidjson/msinttypes/inttypes.h \
+    rapidjson/msinttypes/stdint.h \
+    rapidjson/ostreamwrapper.h \
+    rapidjson/pointer.h \
+    rapidjson/prettywriter.h \
+    rapidjson/rapidjson.h \
+    rapidjson/reader.h \
+    rapidjson/schema.h \
+    rapidjson/stream.h \
+    rapidjson/stringbuffer.h \
+    rapidjson/writer.h
+
+SOURCES += \
+    json_manager.cpp

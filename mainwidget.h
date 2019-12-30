@@ -8,11 +8,7 @@
 #include <map>
 #include <tuple>
 
-#ifdef __linux__
-    //linux code goes here
-#elif _WIN32
-       #include "customhook.h"
-#endif
+#include "json_manager.h"
 
 class MainWidget : public QWidget
 {
@@ -25,19 +21,14 @@ class MainWidget : public QWidget
     private:
         bool clear;
         int is_key_pressed;
-        QString activeButton;
-#ifdef __linux__
-    //linux code goes here
-#elif _WIN32
-        CustomHook hook;
-#endif
-
-        QToolButton* active_button;
         QGridLayout *layout;
+        QString activeButton;
+        QToolButton* active_button;
         QLineEdit *display_old_layout;
         QLineEdit *display_new_layout;
-        std::map<QString, QString> changed_buttons;
+        RemapperConf remapperConf;
         std::vector<QString> all_possible_buttons;
+        std::map<std::string, std::vector<std::string>> changed_vector_of_buttons;
         QString getRightStringOfButton(const QKeyEvent *event);
         std::map<QString, std::tuple<QToolButton*, int, int>> all_buttons;
         void make_button(const QString &text, int x, int y, int width, int height);
