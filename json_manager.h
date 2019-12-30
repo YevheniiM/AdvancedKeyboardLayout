@@ -30,15 +30,15 @@ using RemapperConf = struct RemapperConf
     int remapper_pid{};
     std::map<std::string, std::vector<std::string>> keymap{};
     RemapMode mode{LONG_PRESS};
-    int remap_conf_value{};
+    double remap_conf_value{};
 
     RemapperConf() = default;
 
 
     RemapperConf(const Document &d) :
-            remapper_pid{d["id"].GetInt()},
+            remapper_pid{d["pid"].GetInt()},
             mode{remap_mode_str2enum[d["mode"].GetObject()["type"].GetString()]},
-            remap_conf_value{d["mode"].GetObject()["value"].GetInt()}
+            remap_conf_value{d["mode"].GetObject()["value"].GetDouble()}
     {
         for (auto doc_it = d["keymap"].MemberBegin(); doc_it != d["keymap"].MemberEnd(); ++doc_it)
             keymap[doc_it->name.GetString()] = array2vector(doc_it);

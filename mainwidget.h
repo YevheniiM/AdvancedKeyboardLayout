@@ -4,6 +4,7 @@
 #include <QLineEdit>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QCheckBox>
 
 #include <map>
 #include <tuple>
@@ -27,6 +28,7 @@ class MainWidget : public QWidget
         QLineEdit *display_old_layout;
         QLineEdit *display_new_layout;
         RemapperConf remapperConf;
+        QCheckBox *checkBox;
         std::vector<QString> all_possible_buttons;
         std::map<std::string, std::vector<std::string>> changed_vector_of_buttons;
         QString getRightStringOfButton(const QKeyEvent *event);

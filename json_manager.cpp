@@ -39,7 +39,7 @@ void write_to_json(const std::string &json_file_name, int pid, std::string mode,
             key.SetString("type", allocator);
             value.SetString(mode.c_str(), allocator);
             child.AddMember(key, value, allocator);
-            key.SetString("info", allocator);
+            key.SetString("value", allocator);
             child.AddMember(key, conf_value, allocator);
             key.SetString("mode", allocator);
             root.AddMember(key, child, allocator);

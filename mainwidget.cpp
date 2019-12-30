@@ -2,9 +2,17 @@
 #include "my_button.h"
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QCheckBox>
 #include "mainwidget.h"
 #include <iostream>
 #include "json_manager.h"
+#ifdef __linux__
+#include <signal.h>
+#elif _WIN32
+    // windows code goes here
+#else
+
+#endif
 
 MainWidget::MainWidget() {
     // create two areas, where program will take out results
@@ -125,6 +133,8 @@ MainWidget::MainWidget() {
 
     QToolButton* apply_button = make_system_button("Apply", 8, 17, 1, 3);
     QToolButton* delete_button = make_system_button("Delete", 8, 14, 1, 3);
+    checkBox = new QCheckBox(tr("Multiple keys"));
+    layout->addWidget(checkBox, 8, 3, 1, 3);
     QObject::connect(apply_button, SIGNAL(clicked()), this, SLOT(apply()));
     QObject::connect(delete_button, SIGNAL(clicked()), this, SLOT(deleteHooks()));
 
@@ -286,8 +296,11 @@ void MainWidget::keypressed(const QString &text)
             active_button->setText(activeButton);
         }else if(activeButton != ""){
             QToolButton *new_button = std::get<0>(all_buttons.find(activeButton)->second);
+            if(!checkBox->checkState()){
+                changed_vector_of_buttons[activeButton.toStdString()].clear();
+                new_button->setText(txt);
+            }
             changed_vector_of_buttons[activeButton.toStdString()].push_back(txt.toStdString());
-            new_button->setText(txt);
             activeButton = "";
             active_button->setText("Active button");
         }
@@ -301,13 +314,23 @@ void MainWidget::apply()
 {
     const std::string name{"/home/popenyuk/AdvancedKeyboardLayout/keyboardlayout.json"};
     auto current_json = confs_from_json(name);
-    std::cout << current_json.remapper_pid << std::endl;
-    write_to_json(name, current_json.remapper_pid, "", 0.5, changed_vector_of_buttons);
-    changed_vector_of_buttons.clear();
+    if(checkBox->checkState()){
+        write_to_json(name, current_json.remapper_pid, "long_press", 0.5, changed_vector_of_buttons);
+    }else{
+        write_to_json(name, current_json.remapper_pid, "one_press", 0, changed_vector_of_buttons);
+    }
+#ifdef __linux__
+    kill(current_json.remapper_pid, SIGUSR1);
+#elif _WIN32
+    // windows code goes here
+#else
+
+#endif
 }
 
 void MainWidget::deleteHooks()
 {
+    changed_vector_of_buttons.clear();
 }
 
 void MainWidget::keyPressEvent(QKeyEvent *event) {
