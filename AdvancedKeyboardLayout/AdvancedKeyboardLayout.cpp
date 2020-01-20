@@ -1,8 +1,9 @@
-// ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
+﻿// ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include "CustomHook.h"
+
 #include <iostream>
-//#include "winuser.h";
 #include <windows.h>
 #include <Winuser.h>
 #include <map>
@@ -10,29 +11,103 @@
 #include <sstream>
 #include <chrono>
 #include <ctime>
-#include "CustomHook.h"
-
 
 using std::cout;
 using std::cin;
 using std::endl;
 using std::string;
 
-VirtualKeyMapper remapper;
+string read_exe(string prog, string arg)
+{
+    auto command = prog + " " + arg;
 
-char to_remap;
+    BOOL ok = TRUE;
+    HANDLE hStdInPipeRead = NULL;
+    HANDLE hStdInPipeWrite = NULL;
+    HANDLE hStdOutPipeRead = NULL;
+    HANDLE hStdOutPipeWrite = NULL;
+
+    SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
+    ok = CreatePipe(&hStdInPipeRead, &hStdInPipeWrite, &sa, 0);
+    if (ok == FALSE) return "CreatePipe failed";
+    ok = CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0);
+    if (ok == FALSE) return "CreatePipe failed";
+
+    STARTUPINFO si = { };
+    si.cb = sizeof(STARTUPINFO);
+    si.dwFlags = STARTF_USESTDHANDLES;
+    si.hStdError = hStdOutPipeWrite;
+    si.hStdOutput = hStdOutPipeWrite;
+    si.hStdInput = hStdInPipeRead;
+    PROCESS_INFORMATION pi = { };
+    
+    TCHAR lpCommandLine[1024] = { 0 };
+    mbstowcs(lpCommandLine, command.c_str(), 1024);
+
+    LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
+    LPSECURITY_ATTRIBUTES lpThreadAttribute = NULL;
+    BOOL bInheritHandles = TRUE;
+    DWORD dwCreationFlags = 0;
+    LPVOID lpEnvironment = NULL;
+    LPCWSTR lpCurrentDirectory = NULL;
+
+    ok = CreateProcess(
+        NULL,
+        lpCommandLine,
+        lpProcessAttributes,
+        lpThreadAttribute,
+        bInheritHandles,
+        dwCreationFlags,
+        lpEnvironment,
+        lpCurrentDirectory,
+        &si,
+        &pi);
+
+    if (ok == FALSE) return "CreateProcess failed";
+
+    CloseHandle(hStdOutPipeWrite);
+    CloseHandle(hStdInPipeRead);
+
+    char buf[1024 + 1] = { };
+    DWORD dwRead = 0;
+    DWORD dwAvail = 0;
+    ok = ReadFile(hStdOutPipeRead, buf, 1024, &dwRead, NULL);
+    string str{};
+    while (ok == TRUE)
+    {
+        buf[dwRead] = '\0';
+        OutputDebugStringA(buf);
+        str += string{ buf };
+        ok = ReadFile(hStdOutPipeRead, buf, 1024, &dwRead, NULL);
+    }
+
+    CloseHandle(hStdOutPipeRead);
+    CloseHandle(hStdInPipeWrite);
+    DWORD dwExitCode = 0;
+    GetExitCodeProcess(pi.hProcess, &dwExitCode);
+    return str;
+}
+
 
 int main()
 {
-	auto hook = CustomHook();
-	hook.SetHook();
-	remapper.remap("A", "B");
+    //string prog = "D:\\untitled2\\dist\\hello.exe";
+    //string arg = "\"hello from exe\"";
+    //std::cout << read_exe(prog, arg) << std::endl;
+    
+    auto hook = CustomHook();
+    hook.SetHook();
 
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
+    auto conf = confs_from_json("settings.json");
+    remapper.init_from_conf(conf);
 
-	}
+    MSG msg;
 
-	return 0;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
 }

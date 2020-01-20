@@ -1,0 +1,12 @@
+{
+  "id": 0,
+  "keymap": {
+    "a": [ "z", "x", "c", "q", "w", "e" ],
+    "c": [ "q", "w", "e" ],
+    "v": [ "g" ]
+  },
+  "mode": {
+    "type": "long_press",
+    "value": 2
+  }
+}

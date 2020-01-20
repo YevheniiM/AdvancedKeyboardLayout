@@ -23,5 +23,22 @@
     <ClInclude Include="CustomHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VirtualKeyMapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RemapperConf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomWindows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="settings.json">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="D:\untitled2\dist\hello.exe">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
