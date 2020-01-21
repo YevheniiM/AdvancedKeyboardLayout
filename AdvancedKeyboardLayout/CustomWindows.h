@@ -12,7 +12,6 @@
 #include <map>
 #include <chrono>
 #include <thread>
-#include "VirtualKeyMapper.h"
 
 
 WindowsProperties properties;

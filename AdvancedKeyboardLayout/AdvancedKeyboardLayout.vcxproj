@@ -157,13 +157,30 @@
   <ItemGroup>
     <ClInclude Include="CustomHook.h" />
     <ClInclude Include="CustomWindows.h" />
+    <ClInclude Include="ProcessExe.h" />
     <ClInclude Include="RemapperConf.h" />
     <ClInclude Include="VirtualKeyMapper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="D:\untitled2\dist\hello.exe" />
+    <None Include="packages.config" />
     <None Include="settings.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="icu4c.readme.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Icu4c.Win.Full.Lib.59.1.15\build\Icu4c.Win.Full.Lib.targets" Condition="Exists('..\packages\Icu4c.Win.Full.Lib.59.1.15\build\Icu4c.Win.Full.Lib.targets')" />
+    <Import Project="..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.71.0.0\build\boost.targets')" />
+    <Import Project="..\packages\boost_locale-vc140.1.71.0.0\build\boost_locale-vc140.targets" Condition="Exists('..\packages\boost_locale-vc140.1.71.0.0\build\boost_locale-vc140.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Icu4c.Win.Full.Lib.59.1.15\build\Icu4c.Win.Full.Lib.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Icu4c.Win.Full.Lib.59.1.15\build\Icu4c.Win.Full.Lib.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.71.0.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_locale-vc140.1.71.0.0\build\boost_locale-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_locale-vc140.1.71.0.0\build\boost_locale-vc140.targets'))" />
+  </Target>
 </Project>

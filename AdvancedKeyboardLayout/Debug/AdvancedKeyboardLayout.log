@@ -2,7 +2,51 @@
 C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\RemapperConf.h(55,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\VirtualKeyMapper.h(27,56): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\VirtualKeyMapper.h(107,60): warning C4244: '=': conversion from 'float' to 'unsigned long', possible loss of data
+C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomWindows.h(110,10): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
 C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomWindows.h(111,10): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
-C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomWindows.h(112,10): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
-C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomWindows.h(114,1): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomWindows.h(113,1): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomHook.h(137,28): warning C4018: '<': signed/unsigned mismatch
+C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomHook.h(262,19): warning C4244: 'argument': conversion from 'SHORT' to 'BYTE', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(2388,23): warning C4244: 'argument': conversion from 'wchar_t' to 'const _Elem', possible loss of data
+          with
+          [
+              _Elem=char
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(2399): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(_Iter,const _Iter,std::input_iterator_tag)' being compiled
+          with
+          [
+              _Iter=wchar_t *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(2399): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(_Iter,const _Iter,std::input_iterator_tag)' being compiled
+          with
+          [
+              _Iter=wchar_t *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(2379): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(const _Iter,const _Iter,std::forward_iterator_tag)' being compiled
+          with
+          [
+              _Iter=wchar_t *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(2379): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(const _Iter,const _Iter,std::forward_iterator_tag)' being compiled
+          with
+          [
+              _Iter=wchar_t *
+          ]
+C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomHook.h(243): message : see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,void>(_Iter,_Iter,const _Alloc &)' being compiled
+          with
+          [
+              _Elem=wchar_t,
+              _Iter=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+              _Alloc=std::allocator<char>
+          ]
+C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\AdvancedKeyboardLayout\CustomHook.h(243): message : see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,void>(_Iter,_Iter,const _Alloc &)' being compiled
+          with
+          [
+              _Elem=wchar_t,
+              _Iter=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+              _Alloc=std::allocator<char>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\chrono(632): message : see reference to class template instantiation 'std::chrono::duration<double,std::ratio<1,1>>' being compiled
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\chrono(178): message : see reference to class template instantiation 'std::chrono::duration<__int64,std::nano>' being compiled
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\chrono(610): message : see reference to class template instantiation 'std::chrono::time_point<std::chrono::steady_clock,std::chrono::nanoseconds>' being compiled
   AdvancedKeyboardLayout.vcxproj -> C:\Users\xmolo\source\repos\AdvancedKeyboardLayout\Debug\AdvancedKeyboardLayout.exe

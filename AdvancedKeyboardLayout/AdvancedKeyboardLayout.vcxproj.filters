@@ -32,6 +32,9 @@
     <ClInclude Include="CustomWindows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProcessExe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.json">
@@ -40,5 +43,21 @@
     <None Include="D:\untitled2\dist\hello.exe">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="packages.config" />
+    <None Include="@(IcuLibsX86)" />
+    <None Include="@(IcuLibsX86)" />
+    <None Include="@(IcuLibsX86)" />
+    <None Include="@(IcuLibsX86)" />
+    <None Include="@(IcuLibsX86)" />
+    <None Include="@(IcuLibsX86)" />
+    <None Include="@(IcuLibsX64)" />
+    <None Include="@(IcuLibsX64)" />
+    <None Include="@(IcuLibsX64)" />
+    <None Include="@(IcuLibsX64)" />
+    <None Include="@(IcuLibsX64)" />
+    <None Include="@(IcuLibsX64)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="icu4c.readme.txt" />
   </ItemGroup>
 </Project>

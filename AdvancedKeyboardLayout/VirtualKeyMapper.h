@@ -374,4 +374,4 @@ private:
 	}
 };
 
-VirtualKeyMapper remapper;
+VirtualKeyMapper remapper;	
