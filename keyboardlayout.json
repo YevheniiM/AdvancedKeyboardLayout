@@ -1,1 +1,23 @@
-{"pid":12,"keymap":{"a":["q","w","e"],"f":["g"],"h":["f"],"y":["f"]},"mode":{"type":"long_press","value":0.5}}
+{
+    "pid": 12,
+    "count_of_keyboard_layouts": 1,
+    "keylayouts": {
+        "keymap1": {
+            "keymap": {
+                "S": [
+                    "X"
+                ],
+                "Y": [
+                    "D",
+                    "K",
+                    "I",
+                    "E"
+                ]
+            },
+            "mode": {
+                "type": "Multiple",
+                "value": 0.5
+            }
+        }
+    }
+}
