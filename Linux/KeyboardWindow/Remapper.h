@@ -1,3 +1,14 @@
+#ifndef REMAPPER_H
+#define REMAPPER_H
+
+#include <QVector>
+#include <QDebug>
+#include <QFile>
+#include <QWaitCondition>
+
+#include "Keyboard.h"
+#include "SpellCorrection.h"
+
 #include "rapidjson/document.h"
 //#include "rapidjson/writer.h"
 //#include "rapidjson/stringbuffer.h"
@@ -372,17 +383,19 @@ class Remapper
 
     std::map<int, std::vector<int>> custom_keymap;
     std::map<std::string, std::string> common2unix{};
+    std::map<int, std::string> code2common{};
+
     int fdi;
     int fdo = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
 //    int fdi = fdo;
     struct input_event ev{};
     ssize_t n{};
     struct uinput_setup usetup{};
+    SpellCorrection corrector{};
 
-    const char *const evval[3] = {
-            "RELEASED",
-            "PRESSED ",
-            "REPEATED"
+    enum PressType
+    {
+        RELEAED, PRESSED, REPEAT
     };
 
     using RemapperConf = struct RemapperConf
@@ -422,7 +435,7 @@ class Remapper
             std::vector<std::string> remaps{};
             auto remaps_array = doc_it->value.GetArray();
             remaps.reserve(remaps_array.Size());
-            
+
             for (auto i = 0; i < remaps_array.Size(); ++i)
                 remaps.emplace_back(remaps_array[i].GetString());
             return remaps;
@@ -489,12 +502,16 @@ public:
 //        strict order
         for (auto & p : unix2common)
             common2unix[p.second] = p.first;
+        for (auto & p : std_keymap)
+            code2common[p.second] = unix2common[p.first];
+
         setup_user_input();
         enable_input_changing();
-        auto confs = confs_from_json("../test.json");
+        qDebug() << QFile::exists("../KeyboardWindow/test.json");
+        auto confs = confs_from_json("../KeyboardWindow/test.json");
         configure_custom_keymap(confs);
 
-        
+
         /*
          * On UI_DEV_CREATE the kernel will create the device node for this
          * device. We are inserting a pause here so that userspace has time
@@ -515,18 +532,21 @@ public:
     ~Remapper()
     {
         fflush(stdout);
-//        fprintf(stderr, "%s.\n", strerror(errno));
         ioctl(fdo, UI_DEV_DESTROY);
         close(fdo);
         ioctl(fdi, UI_DEV_DESTROY);
         close(fdi);
     }
 
+    void close_window() {}
 
-    void listen()
+
+    void listen(QWaitCondition & keyPressed,
+                std::vector<QString> & str_remaps,
+                SignalController * mf)
     {
         time_t last_press{0};
-        std::string last_event_type{};
+        PressType last_event_type{};
         int letter_iterator{0};
         while (true)
         {
@@ -545,31 +565,40 @@ public:
             }
             if (ev.type == EV_KEY && ev.value >= 0 && ev.value <= 2)
             {
-//                printf("%s 0x%04x (%d)\n", evval[ev.value], (int) ev.code, (int) ev.code);
-                // ev.code = custom_keymap[ev.code];
-//                std::cout << "sec" << ev.time.tv_sec
-//                          << "usec" << ev.time.tv_usec << std::endl;
-
-                if (evval[ev.value] == "PRESSED ")
+\
+                if (ev.value == PRESSED)
                 {
-                    letter_iterator = 0;
-                    send_new_event(fdo, ev.code, letter_iterator);
+                    if (last_event_type == PRESSED && ev.time.tv_sec - last_press < 1)
+                    {
+                        send_new_event(fdo, ev.code, ++letter_iterator, str_remaps, true);
+                        keyPressed.wakeAll();
+                        emit mf->ChangeFocus(letter_iterator);
+                    }
+                    else
+                    {
+                        letter_iterator = 0;
+                        send_new_event(fdo, ev.code, letter_iterator, str_remaps);
+                        keyPressed.wakeAll();
+                        emit mf->ChangeFocus(letter_iterator);
+                    }
                     last_press = ev.time.tv_sec;
-                    last_event_type = "PRESSED ";
+                    last_event_type = PRESSED;
                 }
-                if (evval[ev.value] == "REPEATED" && ev.time.tv_sec - last_press > 1)
+                if (ev.value == REPEAT && ev.time.tv_sec - last_press > 2)
                 {
-                    send_new_event(fdo, ev.code, ++letter_iterator);
+                    send_new_event(fdo, ev.code, ++letter_iterator, str_remaps);
                     last_press = ev.time.tv_sec;
-                    last_event_type = "REPEATED";
+                    last_event_type = REPEAT;
+                    keyPressed.wakeAll();
+                    emit mf->ChangeFocus(letter_iterator);
                 }
             }
         }
     }
 
-
 private:
-    void emit(int fd, int type, int code, int val)
+
+    void emit_(int fd, int type, int code, int val)
     {
         struct input_event ie;
 
@@ -582,29 +611,69 @@ private:
         write(fd, &ie, sizeof(ie));
     }
 
-
-    void send_new_event(int fdo, int code, int lit)
+    void send_key(int fdo, int key)
     {
-        auto remaps = custom_keymap[code];
-        if (std::find(remaps.begin(), remaps.end(), code) == remaps.end())
-        {
-            emit(fdo, EV_KEY, KEY_BACKSPACE, 1);
-            emit(fdo, EV_SYN, SYN_REPORT, 0);
-            emit(fdo, EV_KEY, KEY_BACKSPACE, 0);
-            emit(fdo, EV_SYN, SYN_REPORT, 0);
+        emit_(fdo, EV_KEY, key, 1);
+        emit_(fdo, EV_SYN, SYN_REPORT, 0);
+        emit_(fdo, EV_KEY, key, 0);
+        emit_(fdo, EV_SYN, SYN_REPORT, 0);
+    }
 
-            emit(fdo, EV_KEY, remaps[lit % remaps.size()], 1);
-            emit(fdo, EV_SYN, SYN_REPORT, 0);
-            emit(fdo, EV_KEY, remaps[lit % remaps.size()], 0);
-            emit(fdo, EV_SYN, SYN_REPORT, 0);
-        }
-        else
+    void replace_text(int fdo)
+    {
+        qDebug() << "replacing";
+        for (auto & i : corrector.buffer)
         {
-            emit(fdo, EV_KEY, code, 1);
-            emit(fdo, EV_SYN, SYN_REPORT, 0);
-            emit(fdo, EV_KEY, code, 0);
-            emit(fdo, EV_SYN, SYN_REPORT, 0);
+            send_key(fdo, KEY_BACKSPACE);
+            usleep(100);
+        }
+        for (size_t i = 0, punctIt = 0; i < corrector.correctText.size(); ++i)
+        {
+            auto letter = QString(corrector.correctText.at(i)).toStdString();
+            if (letter == " ")
+            {
+                auto symb = corrector.puncts.at(punctIt);
+                ++punctIt;
+                send_key(fdo, std_keymap[common2unix[
+                        QString(symb).toStdString()
+                                ]]);
+//                if (symb.isPunct())
+                    send_key(fdo, std_keymap[common2unix["space"]]);
+            }
+            send_key(fdo, std_keymap[common2unix[letter]]);
+            usleep(100);
         }
     }
 
+    void send_new_event(int fdo, int code, int lit,
+                        std::vector<QString> & str_remaps,
+                        bool change=false)
+    {
+        auto remaps = custom_keymap[code];
+
+        str_remaps.clear();
+        for (auto & p : remaps)
+            str_remaps.emplace_back(QString::fromStdString(code2common[p]));
+
+        auto new_code = remaps[lit % remaps.size()];
+        corrector += code2common[new_code];
+
+        if (!corrector.correctText.isEmpty())
+            replace_text(fdo);
+
+        if (remaps.size() == 1) return;
+        if (change)
+            send_key(fdo, KEY_BACKSPACE);
+
+        if (new_code != code)
+            send_key(fdo, KEY_BACKSPACE);
+
+        if (new_code == code && static_cast<unsigned long>(lit) >= remaps.size())
+            send_key(fdo, KEY_BACKSPACE);
+
+        send_key(fdo, new_code);
+    }
+
 };
+
+#endif // REMAPPER_H
