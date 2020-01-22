@@ -7,9 +7,10 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QToolButton>
-#include <iostream>
+#include <utility>
+#include <functional>
 
-extern const QVector<QVector<QString>> buttons;
+extern const std::vector<std::vector<QString>> buttons;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     new_file(true), file_changed(false),
@@ -20,11 +21,14 @@ MainWindow::MainWindow(QWidget *parent)
     SetupStatusbar();
     filesMask = tr("Json Files (*.json);;");
     app_name =  windowTitle();
-    keyMaps.emplace_back();
-    for(int index = 0; index < buttons.size(); ++index){
+    for(int i = 0; i < 6; ++i){
+        keyMaps.emplace_back();
+    }
+    for(size_t index = 0; index < buttons.size(); ++index){
+        all_buttons.emplace_back();
         int horizontal = 0;
-        for(int new_index = 0; new_index < buttons.at(index).size(); ++new_index){
-            int len = 1;
+        for(size_t new_index = 0; new_index < buttons.at(index).size(); ++new_index){
+            size_t len = 1;
             if(!buttons.at(index).at(new_index).size()){
                 continue;
             }
@@ -33,6 +37,19 @@ MainWindow::MainWindow(QWidget *parent)
                 QToolButton *button = new QToolButton();
                 button->setText(buttons.at(index).at(new_index));
                 button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+                if(index == 0){
+                    QObject::connect(button, SIGNAL(clicked()), this, SLOT(on_Row_1_clicked()));
+                }else if(index == 1){
+                    QObject::connect(button, SIGNAL(clicked()), this, SLOT(on_Row_2_clicked()));
+                }else if(index == 2){
+                    QObject::connect(button, SIGNAL(clicked()), this, SLOT(on_Row_3_clicked()));
+                }else if(index == 3){
+                    QObject::connect(button, SIGNAL(clicked()), this, SLOT(on_Row_4_clicked()));
+                }else if(index == 4){
+                    QObject::connect(button, SIGNAL(clicked()), this, SLOT(on_Row_5_clicked()));
+                }else if(index == 5){
+                    QObject::connect(button, SIGNAL(clicked()), this, SLOT(on_Row_6_clicked()));
+                }
                 ui->Rows->addWidget(button);
                 ui->Rows->setStretch(index, 1);
             }else{
@@ -45,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
                 }if(buttons.at(index).at(new_index) == "space"){
                     len = 6;
                 }
-                make_button(buttons.at(index).at(new_index).toUpper(), index, horizontal, 1, len);
+                QToolButton *button = make_button(buttons.at(index).at(new_index).toUpper(), index, horizontal, 1, len);
+                all_buttons.at(index).push_back(button);
                 horizontal += len;
             }
         }
@@ -58,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->NTimes->setChecked(false);
     ui->Hold->setChecked(false);
     ui->period->setEnabled(false);
+    activeRow = 0;
 }
 
 MainWindow::~MainWindow()
@@ -144,7 +163,7 @@ void MainWindow::on_actionOpen_triggered()
     setFileName(QFileDialog::getOpenFileName(this, tr("Open File"), QString(), filesMask));
 
     if (!curFileName.isEmpty()) {
-//        auto current_json = confs_from_json(curFileName.toStdString());
+//        read_to_json(curFileName.toStdString(), pid, keyMaps);
     }
 }
 
@@ -156,16 +175,19 @@ void MainWindow::setFileName(const QString& fileName)
     sbFilename->setToolTip( curFI.canonicalFilePath() );
 }
 
-void MainWindow::make_button(const QString &text, int x, int y, int height, int width){
+QToolButton* MainWindow::make_button(const QString &text, int x, int y, int height, int width){
     // create new Button and set default text and policy
     QToolButton *button = new QToolButton();
     button->setText(text);
     button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     ui->KeyboardSettings->addWidget(button, x, y, height, width);
     if(keyMaps.at(activeKeyLayout).search(text)){
-        keyMaps.at(activeKeyLayout).all_buttons[text] = std::make_tuple(button, x, y);
+        for(int i = 0; i < 6; ++i){
+          keyMaps.at(i).all_buttons[text] = std::make_tuple(button, x, y);
+        }
         QObject::connect(button, SIGNAL(clicked()), this, SLOT(keypressed()));
     }
+    return button;
 }
 
 QString MainWindow::getRightStringOfButton(const QKeyEvent *event){
@@ -255,6 +277,7 @@ void MainWindow::keypressed(const QString &text)
     {
         txt = button->text().toUpper();
     }
+
     if(txt != ""){
         if(button != nullptr && keyMaps.at(activeKeyLayout).activeButton == ""){
             keyMaps.at(activeKeyLayout).activeButton = txt;
@@ -320,4 +343,147 @@ void MainWindow::on_SingleKeys_clicked()
 void MainWindow::on_actionSave_triggered()
 {
     write_to_json(curFileName.toStdString(), 12, keyMaps);
+}
+
+void MainWindow::ClearKeyboard(){
+    for(size_t index = 0; index < buttons.size(); ++index){
+        int minus = -1;
+        if(index == 0)
+            minus = -2;
+        for(size_t index_x = 0; index_x < (buttons.at(index).size() + minus); ++index_x){
+            auto item = keyMaps.at(activeKeyLayout).changed_vector_of_buttons.find(all_buttons.at(index).at(index_x)->text().toUpper().toStdString());
+            if(keyMaps.at(activeKeyLayout).mode == "Multiple" || item == keyMaps.at(activeKeyLayout).changed_vector_of_buttons.end()){
+                all_buttons.at(index).at(index_x)->setText(buttons.at(index).at(index_x+1).toUpper());
+            }else{
+                all_buttons.at(index).at(index_x)->setText(item->second.at(0).c_str());
+            }
+        }
+    }
+}
+
+void MainWindow::on_FirstLayout_clicked()
+{
+    activeKeyLayout = 0;
+    ClearKeyboard();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    activeKeyLayout = 1;
+    ClearKeyboard();
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    activeKeyLayout = 2;
+    ClearKeyboard();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    activeKeyLayout = 3;
+    ClearKeyboard();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    activeKeyLayout = 4;
+    ClearKeyboard();
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    activeKeyLayout = 5;
+    ClearKeyboard();
+}
+
+void MainWindow::change_two_rows(size_t last_row, size_t current_row){
+    for(size_t index = 1; index < buttons.at(last_row).size() && index < buttons.at(current_row).size(); ++index){
+        is_key_pressed += 1;
+        QString txt = buttons.at(last_row - 1).at(index).toUpper();
+        std::map<QString, std::tuple<QToolButton*, int, int>>::iterator button = keyMaps.at(activeKeyLayout).all_buttons.find(txt);
+        if(button != keyMaps.at(activeKeyLayout).all_buttons.end()){
+            std::get<0>(button->second)->animateClick();
+            keypressed(txt);
+        }
+        is_key_pressed += 1;
+        txt = buttons.at(current_row - 1).at(index).toUpper();
+        button = keyMaps.at(activeKeyLayout).all_buttons.find(txt);
+        if(button != keyMaps.at(activeKeyLayout).all_buttons.end()){
+            std::get<0>(button->second)->animateClick();
+            keypressed(txt);
+        }
+    }
+}
+
+void MainWindow::on_Row_1_clicked()
+{
+    if(activeRow == 0 || activeRow == 1){
+        activeRow = 1;
+        ui->LastActiveRow->setText("First row");
+    }else{
+        change_two_rows(activeRow, 1);
+        activeRow = 0;
+        ui->LastActiveRow->setText("LastActiveRow");
+    }
+}
+
+void MainWindow::on_Row_2_clicked()
+{
+    if(activeRow == 0 || activeRow == 2){
+        activeRow = 2;
+        ui->LastActiveRow->setText("Second row");
+    }else{
+        change_two_rows(activeRow, 2);
+        activeRow = 0;
+        ui->LastActiveRow->setText("LastActiveRow");
+    }
+}
+
+void MainWindow::on_Row_3_clicked()
+{
+    if(activeRow == 0 || activeRow == 3){
+        activeRow = 3;
+        ui->LastActiveRow->setText("Third row");
+    }else{
+        change_two_rows(activeRow, 3);
+        activeRow = 0;
+        ui->LastActiveRow->setText("LastActiveRow");
+    }
+}
+
+void MainWindow::on_Row_4_clicked()
+{
+    if(activeRow == 0 || activeRow == 4){
+        activeRow = 4;
+        ui->LastActiveRow->setText("Fourth row");
+    }else{
+        change_two_rows(activeRow, 4);
+        activeRow = 0;
+        ui->LastActiveRow->setText("LastActiveRow");
+    }
+}
+
+void MainWindow::on_Row_5_clicked()
+{
+    if(activeRow == 0 || activeRow == 5){
+        activeRow = 5;
+        ui->LastActiveRow->setText("Fifth row");
+    }else{
+        change_two_rows(activeRow, 5);
+        activeRow = 0;
+        ui->LastActiveRow->setText("LastActiveRow");
+    }
+}
+
+void MainWindow::on_Row_6_clicked()
+{
+    if(activeRow == 0 || activeRow == 6){
+        activeRow = 6;
+        ui->LastActiveRow->setText("Sixth row");
+    }else{
+        change_two_rows(activeRow, 6);
+        activeRow = 0;
+        ui->LastActiveRow->setText("LastActiveRow");
+    }
 }

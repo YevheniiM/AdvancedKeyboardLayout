@@ -20,7 +20,7 @@
    <string>SmartKeyboard</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/resources/keyboard.png</normaloff>:/resources/keyboard.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -142,6 +142,13 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="LastActiveRow">
+        <property name="text">
+         <string>LastActiveRow</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="0" column="0">
@@ -160,7 +167,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="AddLayout">
+       <widget class="QPushButton" name="pushButton_5">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -168,22 +175,61 @@
          </size>
         </property>
         <property name="text">
-         <string>Add new layout</string>
+         <string>Second Layout</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="minimumSize">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>100</width>
+          <height>75</height>
          </size>
         </property>
-       </spacer>
+        <property name="text">
+         <string>Third Layout</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>75</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Fourth Layout</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>75</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Fifth Layout</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>75</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Sixth Layout</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -249,7 +295,7 @@
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/create_file.png</normaloff>:/resources/create_file.png</iconset>
    </property>
    <property name="text">
@@ -261,7 +307,7 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/folder.png</normaloff>:/resources/folder.png</iconset>
    </property>
    <property name="text">
@@ -273,7 +319,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/save_file.png</normaloff>:/resources/save_file.png</iconset>
    </property>
    <property name="text">
@@ -285,7 +331,7 @@
   </action>
   <action name="actionSave_as">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/save_file_as.png</normaloff>:/resources/save_file_as.png</iconset>
    </property>
    <property name="text">
@@ -297,7 +343,7 @@
   </action>
   <action name="actionRun">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/run_file.png</normaloff>:/resources/run_file.png</iconset>
    </property>
    <property name="text">
@@ -309,7 +355,7 @@
   </action>
   <action name="actionHelp">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/help.png</normaloff>:/resources/help.png</iconset>
    </property>
    <property name="text">
@@ -321,7 +367,7 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/resources/logout.png</normaloff>:/resources/logout.png</iconset>
    </property>
    <property name="text">
@@ -332,8 +378,6 @@
    </property>
   </action>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

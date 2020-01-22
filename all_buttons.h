@@ -4,7 +4,7 @@
 #include <QString>
 #include <QVector>
 
-const QVector<QVector<QString>> buttons{
+const std::vector<std::vector<QString>> buttons{
     {"First row", "esc", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "pause\nbreak", "prt sc\nsysrq", "delete\ninsert", ""},
     {"Second row", "`", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "=", "backspace", "home"},
     {"Third row", "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\", "pgup"},

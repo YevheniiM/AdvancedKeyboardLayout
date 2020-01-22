@@ -15,7 +15,7 @@
 
 std::vector<std::string> array2vector(const rapidjson::Document::ConstMemberIterator &doc_it);
 
-void read_to_json(const std::string &json_file_name, int id, std::vector<Keymap> &keylayoutss);
+void read_to_json(const std::string &json_file_name, int &pid, std::vector<Keymap> &keylayoutss);
 
 void write_to_json(const std::string &json_file_name, int id, std::vector<Keymap> &keylayoutss);
 

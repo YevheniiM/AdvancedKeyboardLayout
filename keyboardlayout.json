@@ -1,22 +1,93 @@
 {
     "pid": 12,
-    "count_of_keyboard_layouts": 1,
+    "count_of_keyboard_layouts": 6,
     "keylayouts": {
         "keymap1": {
             "keymap": {
-                "S": [
-                    "X"
+                "J": [
+                    "O",
+                    "L",
+                    "M"
                 ],
-                "Y": [
-                    "D",
-                    "K",
-                    "I",
-                    "E"
+                "U": [
+                    "H"
+                ],
+                "W": [
+                    "Y"
                 ]
+            },
+            "shorcuts": {
+                "new_shortcut": [],
+                "new_command": []
             },
             "mode": {
                 "type": "Multiple",
                 "value": 0.5
+            }
+        },
+        "keymap2": {
+            "keymap": {
+                "B": [
+                    "F"
+                ],
+                "V": [
+                    "H"
+                ],
+                "Y": [
+                    "G"
+                ]
+            },
+            "shorcuts": {
+                "new_shortcut": [],
+                "new_command": []
+            },
+            "mode": {
+                "type": "",
+                "value": 0.0
+            }
+        },
+        "keymap3": {
+            "keymap": {},
+            "shorcuts": {
+                "new_shortcut": [],
+                "new_command": []
+            },
+            "mode": {
+                "type": "",
+                "value": 0.0
+            }
+        },
+        "keymap4": {
+            "keymap": {},
+            "shorcuts": {
+                "new_shortcut": [],
+                "new_command": []
+            },
+            "mode": {
+                "type": "",
+                "value": 0.0
+            }
+        },
+        "keymap5": {
+            "keymap": {},
+            "shorcuts": {
+                "new_shortcut": [],
+                "new_command": []
+            },
+            "mode": {
+                "type": "",
+                "value": 0.0
+            }
+        },
+        "keymap6": {
+            "keymap": {},
+            "shorcuts": {
+                "new_shortcut": [],
+                "new_command": []
+            },
+            "mode": {
+                "type": "",
+                "value": 0.0
             }
         }
     }
